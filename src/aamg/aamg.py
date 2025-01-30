@@ -1,7 +1,7 @@
 import os
 import shutil
 
-def Generate(app:bool=True, aboutapp:str= """""", apppath:str= "", unipath:str= "", repname:str= "", repcheck:str= "", reppath:str= ""
+def Generate(app:bool=True,appname:str ="", aboutapp:str= """""", apppath:str= "", unipath:str= "", repname:str= "", repcheck:str= "", reppath:str= ""
             , reppara=None, icon:str = "", items=None, paths_to_check=None, wintitle:str="", items_para=None):
     """this function is the generate function which would generate the AAM depending on the set parameters
     and this is a list of each parameter and what is meant for it
@@ -9,54 +9,57 @@ def Generate(app:bool=True, aboutapp:str= """""", apppath:str= "", unipath:str= 
     1-app(Boolean type): choose if you want AAM to be complied as code only or code + app
 
 
-    2-aboutapp(String type):a description about the app e.g.: 'a fast, simple and safe web browser'
+    2-appname(String type): this one is just the name of the app
 
 
-    3-apppath(String type):the path of the app's .exe file which the user can start it though the 'Open' button
+    3-aboutapp(String type):a description about the app e.g.: 'a fast, simple and safe web browser'
 
 
-    4-unipath(String type):the path of the app's uninstaller which the user can start the uninstallation process
+    4-apppath(String type):the path of the app's .exe file which the user can start it though the 'Open' button
+
+
+    5-unipath(String type):the path of the app's uninstaller which the user can start the uninstallation process
     though the 'Uninstall' button
     Note:it would close the AAM then the Uninstaller would start
 
 
-    5-repname(String type):the name to call the repair operation,file or process to show when doing a repair in the log
+    6-repname(String type):the name to call the repair operation,file or process to show when doing a repair in the log
 
 
-    6-repcheck(String type):the path that the verifier would check if it does exist or not after the repair process
+    7-repcheck(String type):the path that the verifier would check if it does exist or not after the repair process
 
 
-    7-reppath(String type):the path of the repairing file
+    8-reppath(String type):the path of the repairing file
     Note:use in all cases EXCEPT .zip files
 
 
-    8-reppara(None == list)[move,destination('to', in move),from(in move) , url, start,file-to-start, way]:
+    9-reppara(None == list)[move,destination('to', in move),from(in move) , url, start,file-to-start, way]:
 
 
     this one has the parameters of repairing file(installation,location and processes),
     Note: use IF the repairing file was NOT .zip file
 
 
-    9-icon(String type):the path of the icon of both the application icon and the window icon
+    10-icon(String type):the path of the icon of both the application icon and the window icon
 
 
-    10-items(None == dist){["item's name","item's description"],...}:
+    11-items(None == dist){["item's name","item's description"],...}:
 
 
     this one has name and description of items which required for the app to work
     Note: both existing and nonexistent items are included
 
 
-    11-paths_to_check(None == list)['path1(for the first item in items(8))',...]
+    12-paths_to_check(None == list)['path1(for the first item in items(8))',...]
 
 
     this is a list contains paths that much to be checked for each item in the list to be verified
 
 
-    12-wintitle(String type): this one is the title of the AAM's window
+    13-wintitle(String type): this one is the title of the AAM's window
 
 
-    13-items_para(None == dist){"item's name:(the name of item in items)":[move,destination('to', in move),
+    14-items_para(None == dist){"item's name:(the name of item in items)":[move,destination('to', in move),
     from(in move) , url, start,file-to-start, way],...}
 
 
@@ -80,6 +83,7 @@ import os
 import shutil
 import subprocess
 import urllib.request
+appname = "{appname}"
 aboutapp = """{aboutapp}"""
 apppath:str = "{apppath}"
 unipath:str = "{unipath}"
@@ -318,7 +322,7 @@ def create_ui():
     def Open():
         subprocess.Popen(apppath.replace('\\','/'), creationflags=subprocess.CREATE_NO_WINDOW)
     def Uninstall():
-        if messagebox.askyesno("confirmation", "Are you sure you want to close?"):
+        if messagebox.askyesno("confirmation", f"Are you sure you want to Uninstall {appname}?"):
             subprocess.Popen(unipath.replace('\\', '/'), creationflags=subprocess.CREATE_NO_WINDOW)
             exit()
         else:
