@@ -1,12 +1,11 @@
-import os
-import shutil
-
-def Generate(app:bool=True,appname:str ="", aboutapp:str= """""", apppath:str= "", unipath:str= "", repname:str= "", repcheck:str= "", reppath:str= ""
-            , reppara=None, icon:str = "", items=None, paths_to_check=None, wintitle:str="", items_para=None):
+def Generate(AAMname:str="",appname:str="", aboutapp:str= """""", apppath:str= "", unipath:str= "", repname:str= "", repcheck:str= "", reppath:str= ""
+             , reppara=None, icon:str = "", items=None, paths_to_check=None, wintitle:str="", items_para=None, verify_req:bool=True,
+             verify_rep:bool=True, fixed_false_keys=None, fixed_true_keys=None):
     """this function is the generate function which would generate the AAM depending on the set parameters
     and this is a list of each parameter and what is meant for it
 
-    1-app(Boolean type): choose if you want AAM to be complied as code only or code + app
+
+    1-AAMname: this one is just the name of the AMM's file name
 
 
     2-appname(String type): this one is just the name of the app
@@ -45,7 +44,6 @@ def Generate(app:bool=True,appname:str ="", aboutapp:str= """""", apppath:str= "
 
     11-items(None == dist){["item's name","item's description"],...}:
 
-
     this one has name and description of items which required for the app to work
     Note: both existing and nonexistent items are included
 
@@ -69,6 +67,10 @@ def Generate(app:bool=True,appname:str ="", aboutapp:str= """""", apppath:str= "
 
     which the list corresponds to is the same 'package-qsun 1.6' in the items names in the items dict.
     and the list of each item has info required for installation of the item(requirement)"""
+    if fixed_true_keys is None:
+        fixed_true_keys = []
+    if fixed_false_keys is None:
+        fixed_false_keys = []
     if items_para is None:
         items_para = {}
     if paths_to_check is None:
@@ -83,6 +85,10 @@ import os
 import shutil
 import subprocess
 import urllib.request
+verify_req:bool = {verify_req}
+verify_rep:bool = {verify_rep}
+fixed_false_keys = {fixed_false_keys}
+fixed_true_keys =  {fixed_true_keys}
 appname = "{appname}"
 aboutapp = """{aboutapp}"""
 apppath:str = "{apppath}"
@@ -170,7 +176,7 @@ def create_ui():
     log_text = tk.Text(log_frame, wrap=tk.NONE,bg="black",fg="green")
     log_message("Application started.")
     log_message("paths checking...")
-    if len(items.keys()) == 0:
+    if len(items_in_list) == 0 and len(fixed_false_keys) == 0 and len(fixed_true_keys) == 0:
         log_message("NO PATHS TO BE CHECKED")
         log_message("'req. checker' case...")
         log_message('JOB ENDED')
@@ -179,24 +185,42 @@ def create_ui():
             return True
         else:
             return False
-    for item in range(len(items_in_list)):
-        R = check(paths_to_check[item])
-        if R is True:
+    if verify_req is True:
+        for item in range(len(items_in_list)):
+            R = check(paths_to_check[item])
+            if R is True:
+                n = '(T)'
+                right_list.append(items_in_list[item])
+                log_message(f"'{items_in_list[item]}' path exists")
+            if R is False:
+                n = '(F)'
+                falled_list.append(items_in_list[item])
+                falled_list_paths.append(paths_to_check[item])
+                log_message(f"'{items_in_list[item]}' path doesn't exist to install it hit 'Enter' while selecting the item")
+                for ite_m in range(len(items)):
+                    if items_in_list[ite_m] in falled_list:
+                        falled_items.update({items_in_list[ite_m]: items_in_value[ite_m]})
+                for ite_m2 in range(len(items)):
+                    if items_in_list[ite_m2] in right_list:
+                        right_items.update({items_in_list[ite_m2]: items_in_value[ite_m2]})
+                        listbox2.insert(tk.END, items_in_list[ite_m2] + '(T)')
+    else:
+        for st1 in range(len(fixed_true_keys)):
             n = '(T)'
-            right_list.append(items_in_list[item])
-            log_message(f"'{items_in_list[item]}' path exists")
-        if R is False:
+            right_list.append(fixed_true_keys[st1])
+            log_message(f"'{fixed_true_keys[st1]}' exists")
+        for st2 in range(len(fixed_true_keys)):
             n = '(F)'
-            falled_list.append(items_in_list[item])
-            falled_list_paths.append(paths_to_check[item])
-            log_message(f"'{items_in_list[item]}' path doesn't exist to install it hit 'Enter' while selecting the item")
+            falled_list.append(fixed_false_keys[st2])
+            log_message(f"'{fixed_false_keys[st2]}' doesn't exist")
     for ite_m in range(len(items)):
         if items_in_list[ite_m] in falled_list:
            falled_items.update({items_in_list[ite_m]: items_in_value[ite_m]})
-    for ite_m in range(len(items)):
-        if items_in_list[ite_m] in right_list:
-            right_items.update({items_in_list[ite_m]: items_in_value[ite_m]})
-            listbox2.insert(tk.END, items_in_list[ite_m] + '(T)')
+    for ite_m2 in range(len(items)):
+        if items_in_list[ite_m2] in right_list:
+            right_items.update({items_in_list[ite_m2]: items_in_value[ite_m2]})
+    for right in right_list:
+            listbox2.insert(tk.END, right + '(T)')
     for fall in falled_list:
         listbox.insert(tk.END, fall + '(F)')
     def inst(option:int,name:str):
@@ -273,10 +297,38 @@ def create_ui():
             os.system(f'cmd /c "cd {os.path.dirname(listo[5])} & {listo[5]}"')
             while True:
                 if messagebox.askyesno("NOTE","ONLY WHEN THE OPENED FILE MISSION IS COMPLETE CLICK ON OK,NOTE: NO IS NEGLECTED AND MESSAGE WOULD SHOW AGAIN"):
-                    virf()
+                    if option == 0 and verify_req == True:
+                        virf()
+                    elif option == 1 and verify_rep == True:
+                        virf()
+                    else:
+                        for i in range(listbox.size()):
+                            if listbox.get(i)[:-3] == name:
+                                right_list.append(listbox.get(i)[:-3])
+                                right_items.update({listbox.get(i)[:-3]: falled_items.get(listbox.get(i)[:-3])})
+                                falled_list.remove(listbox.get(i)[:-3])
+                                falled_items.pop(listbox.get(i)[:-3])
+                                listbox2.insert(tk.END, listbox.get(i)[:-3] + '(T)')
+                                listbox.delete(i)
+                                break
+                        log_message(f"'{name}(T)' installation has been done")
                     break
         else:
-            virf()
+            if option == 0 and verify_req == True:
+                virf()
+            elif option == 1 and verify_rep == True:
+                virf()
+            else:
+                for i in range(listbox.size()):
+                    if listbox.get(i)[:-3] == name:
+                        right_list.append(listbox.get(i)[:-3])
+                        right_items.update({listbox.get(i)[:-3]: falled_items.get(listbox.get(i)[:-3])})
+                        falled_list.remove(listbox.get(i)[:-3])
+                        falled_items.pop(listbox.get(i)[:-3])
+                        listbox2.insert(tk.END, listbox.get(i)[:-3] + '(T)')
+                        listbox.delete(i)
+                        break
+                log_message(f"'{name}(T)' installation has been done")
     def on_select_and_enter(event):
         if listbox.curselection():
             for i in listbox.curselection():
@@ -320,10 +372,10 @@ def create_ui():
     greenbg = tk.Label(window,bg='lightgreen')
     greenbg.place(relx=button_x_start, rely=buttons_y, relwidth=1.0, relheight=buttons_height)
     def Open():
-        subprocess.Popen(apppath.replace('\\','/'), creationflags=subprocess.CREATE_NO_WINDOW)
+        os.system(f'cmd /c "cd {os.path.dirname(apppath)} & {apppath}"')
     def Uninstall():
-        if messagebox.askyesno("confirmation", f"Are you sure you want to Uninstall {appname}?"):
-            subprocess.Popen(unipath.replace('\\', '/'), creationflags=subprocess.CREATE_NO_WINDOW)
+        if messagebox.askyesno("confirmation", "Are you sure you want to close?"):
+            os.system(f'cmd /c "cd {os.path.dirname(unipath)} & {unipath}"')
             exit()
         else:
             pass
@@ -340,15 +392,9 @@ def create_ui():
     window.mainloop()
 create_ui()"""
     appinfo = app_seg1 + app_seg2 + app_seg3 + app_seg4
-    s = open('AAM.py','wb')
+    if AAMname == "":
+        s = open('AAM.py','wb')
+    else:
+        s = open(f'{AAMname}.py', 'wb')
     s.write(bytes(appinfo,'utf-8'))
     s.close()
-    if app is True:
-        if os.path.exists(icon):
-           os.system(f'C:\\WeDu\\Python312\\python.exe -m PyInstaller AAM.py -n AAM -i {icon} --onefile --noconsole ')
-           try:
-              shutil.move(icon,f'dist\\{icon}')
-           except (FileNotFoundError,shutil.Error):
-              pass
-        else:
-           os.system(f'C:\\WeDu\\Python312\\python.exe -m PyInstaller AAM.py -n AAM --onefile --noconsole ')
