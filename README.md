@@ -1,4 +1,4 @@
-<img alt="logo (5)" src="https://github.com/user-attachments/assets/83fb5d63-0bbe-496d-a4dd-e626af53ac7b" />
+<img alt="logo" src="https://github.com/user-attachments/assets/83fb5d63-0bbe-496d-a4dd-e626af53ac7b" width=300/>
 
 
 **THE Advanced Application Manager Generator**  or **AAMG** is a Python library for creating **AAMs** from A to Z using Python.
